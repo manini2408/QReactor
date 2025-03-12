@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - QR Code Generator{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Admin Dashboard</h1>
+    
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- User Stats -->
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-white">Total Users</h2>
+                <span class="text-blue-500 dark:text-blue-400">
+                    <i class="fas fa-users text-2xl"></i>
+                </span>
+            </div>
+            <div class="mt-4">
+                <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ user_count }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Registered users</p>
+            </div>
+            <div class="mt-4">
+                <a href="{{ url_for('admin.users') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View All Users →</a>
+            </div>
+        </div>
+        
+        <!-- QR Code Stats -->
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-white">Total QR Codes</h2>
+                <span class="text-green-500 dark:text-green-400">
+                    <i class="fas fa-qrcode text-2xl"></i>
+                </span>
+            </div>
+            <div class="mt-4">
+                <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ qr_count }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Generated QR codes</p>
+            </div>
+            <div class="mt-4">
+                <a href="{{ url_for('admin.qr_codes') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View All QR Codes →</a>
+            </div>
+        </div>
+        
+        <!-- Feedback Stats -->
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-white">Total Feedback</h2>
+                <span class="text-purple-500 dark:text-purple-400">
+                    <i class="fas fa-comment-alt text-2xl"></i>
+                </span>
+            </div>
+            <div class="mt-4">
+                <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ feedback_count }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">User feedback received</p>
+            </div>
+            <div class="mt-4">
+                <a href="{{ url_for('admin.feedback') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View All Feedback →</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Recent Users -->
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Recent Users</h2>
+            {% if recent_users %}
+                <ul class="space-y-4">
+                    {% for user in recent_users %}
+                        <li class="border-b dark:border-gray-700 pb-2 last:border-0">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-800 dark:text-white">{{ user.username }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</p>
+                                </div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ user.created_at.strftime('%Y-%m-%d') }}</span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500 dark:text-gray-400">No users found.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Recent QR Codes -->
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Recent QR Codes</h2>
+            {% if recent_qr_codes %}
+                <ul class="space-y-4">
+                    {% for qr in recent_qr_codes %}
+                        <li class="border-b dark:border-gray-700 pb-2 last:border-0">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-800 dark:text-white truncate max-w-xs">{{ qr.data }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">By: {{ qr.user.username }}</p>
+                                </div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ qr.created_at.strftime('%Y-%m-%d') }}</span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500 dark:text-gray-400">No QR codes found.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Recent Feedback -->
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Recent Feedback</h2>
+            {% if recent_feedback %}
+                <ul class="space-y-4">
+                    {% for feedback in recent_feedback %}
+                        <li class="border-b dark:border-gray-700 pb-2 last:border-0">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-800 dark:text-white truncate max-w-xs">{{ feedback.subject }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">From: {{ feedback.email }}</p>
+                                </div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ feedback.submitted_at.strftime('%Y-%m-%d') }}</span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500 dark:text-gray-400">No feedback found.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Admin Actions Section -->
+    <div class="mt-8">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Admin Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="{{ url_for('admin.users') }}" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <i class="fas fa-users text-blue-500 dark:text-blue-400 text-xl"></i>
+                <span class="font-medium text-gray-800 dark:text-white">Manage Users</span>
+            </a>
+            <a href="{{ url_for('admin.qr_codes') }}" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <i class="fas fa-qrcode text-green-500 dark:text-green-400 text-xl"></i>
+                <span class="font-medium text-gray-800 dark:text-white">Manage QR Codes</span>
+            </a>
+            <a href="{{ url_for('admin.feedback') }}" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <i class="fas fa-comment-alt text-purple-500 dark:text-purple-400 text-xl"></i>
+                <span class="font-medium text-gray-800 dark:text-white">View Feedback</span>
+            </a>
+            <a href="{{ url_for('admin.export') }}" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <i class="fas fa-download text-red-500 dark:text-red-400 text-xl"></i>
+                <span class="font-medium text-gray-800 dark:text-white">Export Data</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

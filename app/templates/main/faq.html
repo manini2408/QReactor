@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ - QR Code Generator{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Frequently Asked Questions</h1>
+        
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden mb-8">
+            <div class="p-6">
+                <div class="space-y-6">
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-white">What is a QR code?</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            QR (Quick Response) codes are two-dimensional barcodes that can be scanned using a smartphone camera. 
+                            They can store various types of information such as URLs, text, contact information, and more.
+                        </p>
+                    </div>
+                    
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-white">How do I create a QR code?</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Creating a QR code is simple:
+                        </p>
+                        <ol class="list-decimal list-inside mt-2 text-gray-600 dark:text-gray-300">
+                            <li>Sign up or log in to your account</li>
+                            <li>Click on "Generate QR" in the navigation menu</li>
+                            <li>Select the type of QR code you want to create</li>
+                            <li>Enter the required information</li>
+                            <li>Customize your QR code if desired</li>
+                            <li>Click "Generate" to create your QR code</li>
+                            <li>Download or save your QR code</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-white">What types of QR codes can I create?</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Our platform supports various types of QR codes, including:
+                        </p>
+                        <ul class="list-disc list-inside mt-2 text-gray-600 dark:text-gray-300">
+                            <li>URL QR codes (link to websites)</li>
+                            <li>Text QR codes (display plain text)</li>
+                            <li>vCard QR codes (share contact information)</li>
+                            <li>Email QR codes (open email clients with pre-filled fields)</li>
+                            <li>SMS QR codes (open messaging apps with pre-filled messages)</li>
+                            <li>Wi-Fi QR codes (connect to Wi-Fi networks)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-white">Are the QR codes I create permanent?</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Yes, the QR codes you create are permanent and will continue to work as long as the information they contain remains valid. 
+                            For example, if you create a URL QR code, it will work as long as the website it links to is accessible.
+                        </p>
+                    </div>
+                    
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-white">Can I customize my QR codes?</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Yes, our platform offers customization options for your QR codes, including:
+                        </p>
+                        <ul class="list-disc list-inside mt-2 text-gray-600 dark:text-gray-300">
+                            <li>Custom colors</li>
+                            <li>Adding a logo to the center of the QR code</li>
+                            <li>Adjusting the shape and style of the QR code elements</li>
+                            <li>Changing the background color or adding a background image</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-white">In what formats can I download my QR codes?</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            You can download your QR codes in several formats, including:
+                        </p>
+                        <ul class="list-disc list-inside mt-2 text-gray-600 dark:text-gray-300">
+                            <li>PNG (raster image, suitable for most uses)</li>
+                            <li>SVG (vector image, scalable without quality loss)</li>
+                            <li>PDF (document format, ideal for printing)</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-white">Is there a limit to how many QR codes I can create?</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Free accounts can create up to 10 QR codes per month. For unlimited QR code creation and additional features, 
+                            consider upgrading to a premium account.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 p-4 bg-blue-50 dark:bg-gray-700 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-white">Still have questions?</h3>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        If you couldn't find the answer to your question, please visit our 
+                        <a href="{{ url_for('main.contact') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">Contact page</a> 
+                        to get in touch with our support team.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

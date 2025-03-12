@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ current_user.theme if current_user.is_authenticated else 'light' }}" class="{{ 'dark' if (current_user.is_authenticated and current_user.theme == 'dark') or (current_user.is_authenticated and current_user.theme == 'system' and request.cookies.get('prefers-dark') == '1') or request.cookies.get('theme_preference') == 'dark' else '' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}QR Code Generator{% endblock %}</title>
+    
+    <!-- Theme initialization - this needs to run BEFORE any rendering -->
+    <script>
+        // Early theme initialization to prevent flash of wrong theme
+        (function() {
+            const storedTheme = localStorage.getItem('app-theme');
+            const cookieTheme = "{{ request.cookies.get('theme_preference', '') }}";
+            const userTheme = "{{ current_user.theme if current_user.is_authenticated else 'light' }}";
+            
+            // Priority: 1. Local storage, 2. Cookie, 3. User setting, 4. Default to light
+            let theme = storedTheme || cookieTheme || userTheme || 'light';
+            
+            if (theme === 'system') {
+                // Check system preference
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } else if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // This ensures dark mode is class-based instead of media-query based
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Theme-specific CSS -->
+    <script>
+        // Set theme based on user preference or system preference
+        function setTheme(theme) {
+            // First update the data-theme attribute for our custom CSS
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Then handle Tailwind dark mode class
+            if (theme === 'dark') {
+                // Apply dark mode
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('app-theme', 'dark');
+            } else if (theme === 'light') {
+                // Remove dark mode
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('app-theme', 'light');
+            } else if (theme === 'system') {
+                // Check system preference
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+                localStorage.setItem('app-theme', 'system');
+                // Store preference in cookie for server-side rendering
+                document.cookie = `prefers-dark=${prefersDark ? '1' : '0'}; path=/; max-age=31536000`;
+            }
+        }
+        
+        // Initialize theme
+        document.addEventListener('DOMContentLoaded', function() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            const storedTheme = localStorage.getItem('app-theme');
+            
+            // If there's a stored theme, use it (to ensure consistency across pages)
+            if (storedTheme) {
+                setTheme(storedTheme);
+            } else {
+                setTheme(theme);
+            }
+            
+            // Listen for system theme changes
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    const currentTheme = localStorage.getItem('app-theme') || theme;
+                    if (currentTheme === 'system') {
+                        setTheme('system');
+                    }
+                });
+            }
+            
+            // Handle theme changes from profile form
+            document.addEventListener('themeChanged', function(e) {
+                setTheme(e.detail.theme);
+            });
+            
+            // Listen for theme select field changes
+            const themeSelect = document.querySelector('select[name="theme"]');
+            if (themeSelect) {
+                themeSelect.addEventListener('change', function() {
+                    // This will immediately show the theme change in the UI
+                    // The actual saving to database happens when form is submitted
+                    setTheme(this.value);
+                });
+            }
+        });
+    </script>
+    
+    {% block styles %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="{{ url_for('main.index') }}" class="text-xl font-bold text-blue-600 dark:text-blue-400 hover:opacity-90 transition-opacity">
+                        <i class="fas fa-qrcode mr-2"></i>QR Code Generator
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="{{ url_for('main.index') }}" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Home</a>
+                    <a href="{{ url_for('main.about') }}" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">About</a>
+                    <a href="{{ url_for('main.faq') }}" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">FAQ</a>
+                    <a href="{{ url_for('main.contact') }}" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Contact</a>
+                    
+                    <!-- Theme Toggle Button -->
+                    <button id="theme-toggle" class="nav-button flex items-center justify-center h-9 w-9 rounded-full text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-sun text-yellow-500 dark:hidden" aria-hidden="true"></i>
+                        <i class="fas fa-moon text-blue-400 hidden dark:block" aria-hidden="true"></i>
+                        <span class="sr-only">Toggle theme</span>
+                    </button>
+                    
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Dashboard</a>
+                        {% else %}
+                            <a href="{{ url_for('user.dashboard') }}" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Dashboard</a>
+                        {% endif %}
+                        <a href="{{ url_for('qr.generator') }}" class="nav-link px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors">Generate QR</a>
+                        <div class="relative ml-3">
+                            <button type="button" id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <span class="sr-only">Open user menu</span>
+                                <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                                    {{ current_user.username[0].upper() }}
+                                </div>
+                            </button>
+                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-10 border border-gray-200 dark:border-gray-700">
+                                <a href="{{ url_for('user.profile' if not current_user.is_admin else 'admin.profile') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
+                                <a href="{{ url_for('user.history' if not current_user.is_admin else 'admin.qr_codes') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">QR History</a>
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Login</a>
+                        <a href="{{ url_for('auth.register') }}" class="nav-link px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors">Sign Up</a>
+                    {% endif %}
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button type="button" id="mobile-menu-button" class="text-gray-500 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="{{ url_for('main.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Home</a>
+                    <a href="{{ url_for('main.about') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">About</a>
+                    <a href="{{ url_for('main.faq') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">FAQ</a>
+                    <a href="{{ url_for('main.contact') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Contact</a>
+                    
+                    <!-- Mobile Theme Toggle -->
+                    <button id="mobile-theme-toggle" class="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-sun text-yellow-500 dark:hidden mr-2"></i>
+                        <i class="fas fa-moon text-blue-400 hidden dark:block mr-2"></i>
+                        <span class="dark:hidden">Toggle Dark Mode</span>
+                        <span class="hidden dark:block">Toggle Light Mode</span>
+                    </button>
+                    
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Dashboard</a>
+                        {% else %}
+                            <a href="{{ url_for('user.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Dashboard</a>
+                        {% endif %}
+                        <a href="{{ url_for('qr.generator') }}" class="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">Generate QR</a>
+                        <a href="{{ url_for('user.profile' if not current_user.is_admin else 'admin.profile') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Profile</a>
+                        <a href="{{ url_for('user.history' if not current_user.is_admin else 'admin.qr_codes') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">QR History</a>
+                        <a href="{{ url_for('auth.logout') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Login</a>
+                        <a href="{{ url_for('auth.register') }}" class="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    <div class="container mx-auto px-4 mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 shadow-inner py-6 border-t border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">&copy; {{ now.year }} QR Code Generator. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="footer-icon text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="footer-icon text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="footer-icon text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="footer-icon text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Toggle mobile menu
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+        
+        // Toggle user dropdown
+        document.getElementById('user-menu-button')?.addEventListener('click', function() {
+            document.getElementById('user-dropdown').classList.toggle('hidden');
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userDropdown = document.getElementById('user-dropdown');
+            
+            if (userMenuButton && userDropdown && !userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Theme toggle button
+        document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+        document.getElementById('mobile-theme-toggle')?.addEventListener('click', toggleTheme);
+        
+        // Theme toggle function
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('app-theme') || document.documentElement.getAttribute('data-theme');
+            const newTheme = (currentTheme === 'dark' || document.documentElement.classList.contains('dark')) ? 'light' : 'dark';
+            
+            // Apply theme immediately
+            setTheme(newTheme);
+            
+            // If user is logged in, save the preference
+            {% if current_user.is_authenticated %}
+                // Create a form and submit it to update the theme in the database
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ url_for('user.change_theme' if not current_user.is_admin else 'admin.change_theme') }}';
+                form.style.display = 'none';
+                
+                const themeInput = document.createElement('input');
+                themeInput.type = 'hidden';
+                themeInput.name = 'theme';
+                themeInput.value = newTheme;
+                
+                const redirectInput = document.createElement('input');
+                redirectInput.type = 'hidden';
+                redirectInput.name = 'redirect_url';
+                redirectInput.value = window.location.href;
+                
+                // Add the form to the document and submit it
+                form.appendChild(themeInput);
+                form.appendChild(redirectInput);
+                document.body.appendChild(form);
+                form.submit();
+            {% else %}
+                // For non-authenticated users, just store preference in localStorage and cookies
+                localStorage.setItem('app-theme', newTheme);
+                document.cookie = `theme_preference=${newTheme}; path=/; max-age=31536000`;
+            {% endif %}
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

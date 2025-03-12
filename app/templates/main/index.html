@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Qreactor{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <!-- Hero Section -->
+    <div class="flex flex-col md:flex-row items-center justify-between mb-16">
+        <div class="md:w-1/2 mb-8 md:mb-0">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
+                Generate Custom QR Codes in Seconds
+            </h1>
+            <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">
+                Create professional QR codes with custom colors, logos, and sizes. Perfect for business cards, marketing materials, websites, and more.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('qr.generator') }}" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+                        Create QR Code
+                    </a>
+                    <a href="{{ url_for('user.dashboard' if not current_user.is_admin else 'admin.dashboard') }}" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-medium rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                        Dashboard
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+                        Get Started
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-medium rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                        Sign Up
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="md:w-1/2 flex justify-center">
+            <img src="{{ url_for('static', filename='images/qr-hero.svg') }}" alt="QR Code Illustration" class="w-full max-w-md">
+        </div>
+    </div>
+    
+    <!-- Features Section -->
+    <div class="mb-16">
+        <h2 class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+            Powerful Features
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <div class="text-blue-600 dark:text-blue-400 text-4xl mb-4">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Custom Colors</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Choose from a wide range of colors to match your brand or design preferences.
+                </p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <div class="text-blue-600 dark:text-blue-400 text-4xl mb-4">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Logo Integration</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Add your logo or any image to the center of your QR code for brand recognition.
+                </p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <div class="text-blue-600 dark:text-blue-400 text-4xl mb-4">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Multiple Sizes</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Generate QR codes in various sizes to fit your specific needs.
+                </p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <div class="text-blue-600 dark:text-blue-400 text-4xl mb-4">
+                    <i class="fas fa-download"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Easy Download</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Download your QR codes in high-quality PNG format for print or digital use.
+                </p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <div class="text-blue-600 dark:text-blue-400 text-4xl mb-4">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Sharing Options</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Share your QR codes directly via email or social media platforms.
+                </p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <div class="text-blue-600 dark:text-blue-400 text-4xl mb-4">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">History Tracking</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Access all your previously generated QR codes in your personal dashboard.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- How It Works Section -->
+    <div class="mb-16">
+        <h2 class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+            How It Works
+        </h2>
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="md:w-1/4 mb-8 md:mb-0 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white text-2xl font-bold rounded-full mb-4">1</div>
+                <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Sign Up</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Create a free account to get started.
+                </p>
+            </div>
+            <div class="hidden md:block text-gray-300 dark:text-gray-600">
+                <i class="fas fa-arrow-right text-3xl"></i>
+            </div>
+            <div class="md:w-1/4 mb-8 md:mb-0 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white text-2xl font-bold rounded-full mb-4">2</div>
+                <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Customize</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Enter your content and customize your QR code.
+                </p>
+            </div>
+            <div class="hidden md:block text-gray-300 dark:text-gray-600">
+                <i class="fas fa-arrow-right text-3xl"></i>
+            </div>
+            <div class="md:w-1/4 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white text-2xl font-bold rounded-full mb-4">3</div>
+                <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Download</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Download or share your QR code.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="bg-blue-600 text-white rounded-lg p-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Ready to Create Your QR Code?</h2>
+        <p class="text-xl mb-6">Join thousands of users who trust our platform for their QR code needs.</p>
+        <div class="flex justify-center gap-4">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('qr.generator') }}" class="px-6 py-3 bg-white text-blue-600 font-medium rounded-md hover:bg-gray-100 transition-colors">
+                    Create QR Code
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.register') }}" class="px-6 py-3 bg-white text-blue-600 font-medium rounded-md hover:bg-gray-100 transition-colors">
+                    Sign Up Free
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="px-6 py-3 bg-blue-700 text-white font-medium rounded-md hover:bg-blue-800 transition-colors">
+                    Login
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

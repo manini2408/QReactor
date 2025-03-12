@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - QR Code Generator{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Contact Us</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Contact Information -->
+            <div class="md:col-span-1">
+                <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 h-full">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Get In Touch</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1">
+                                <i class="fas fa-envelope text-blue-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-gray-800 dark:text-white">Email</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">support@qrcodegenerator.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1">
+                                <i class="fas fa-phone text-blue-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-gray-800 dark:text-white">Phone</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">+1 (555) 123-4567</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1">
+                                <i class="fas fa-map-marker-alt text-blue-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-gray-800 dark:text-white">Address</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">
+                                    123 QR Street<br>
+                                    Tech City, TC 12345<br>
+                                    United States
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-sm font-medium mb-2 text-gray-800 dark:text-white">Follow Us</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="md:col-span-2">
+                <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Send Us a Message</h2>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="p-4 mb-4 text-sm rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('main.contact') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.name.label }}</label>
+                                {{ form.name(class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white") }}
+                                {% if form.name.errors %}
+                                    {% for error in form.name.errors %}
+                                        <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.email.label }}</label>
+                                {{ form.email(class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white") }}
+                                {% if form.email.errors %}
+                                    {% for error in form.email.errors %}
+                                        <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.subject.label }}</label>
+                            {{ form.subject(class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white") }}
+                            {% if form.subject.errors %}
+                                {% for error in form.subject.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.message.label }}</label>
+                            {{ form.message(rows=6, class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white") }}
+                            {% if form.message.errors %}
+                                {% for error in form.message.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            {{ form.submit(class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

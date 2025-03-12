@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Generate QR Code - QR Code Generator{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Generate QR Code</h1>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+            <div class="p-6">
+                <form method="POST" action="{{ url_for('qr.generator') }}" enctype="multipart/form-data" id="qr-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left Column - QR Code Options -->
+                        <div>
+                            <div class="mb-4">
+                                <label for="content" class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                                    Content *
+                                </label>
+                                <textarea id="content" name="content" rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" placeholder="Enter URL, text, or any content for your QR code" required></textarea>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Enter the content you want to encode in the QR code.
+                                </p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="size" class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                                    Size
+                                </label>
+                                <div class="size-selector">
+                                    <div class="size-option active" data-size="200x200">Small</div>
+                                    <div class="size-option" data-size="300x300">Medium</div>
+                                    <div class="size-option" data-size="400x400">Large</div>
+                                    <div class="size-option" data-size="500x500">X-Large</div>
+                                </div>
+                                <input type="hidden" id="size" name="size" value="200x200">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="color" class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                                    Color
+                                </label>
+                                <input type="color" id="color" name="color" value="#000000" class="color-picker">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="logo" class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                                    Logo (Optional)
+                                </label>
+                                <input type="file" id="logo" name="logo" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" accept="image/png, image/jpeg, image/gif">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Upload a logo to place in the center of your QR code. PNG, JPG, or GIF only.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column - Preview -->
+                        <div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-2">
+                                    Preview
+                                </label>
+                                <div class="qr-container" id="qr-preview">
+                                    <div class="flex items-center justify-center h-64 bg-gray-100 dark:bg-gray-700 rounded-md">
+                                        <p class="text-gray-500 dark:text-gray-400 text-center">
+                                            <i class="fas fa-qrcode text-4xl mb-2"></i><br>
+                                            Enter content to generate a preview
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <i class="fas fa-qrcode mr-2"></i> Generate QR Code
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Size selector functionality
+    document.querySelectorAll('.size-option').forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove active class from all options
+            document.querySelectorAll('.size-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            
+            // Add active class to clicked option
+            this.classList.add('active');
+            
+            // Update hidden input value
+            document.getElementById('size').value = this.getAttribute('data-size');
+            
+            // Update preview
+            updatePreview();
+        });
+    });
+    
+    // Color picker change event
+    document.getElementById('color').addEventListener('input', function() {
+        updatePreview();
+    });
+    
+    // Content change event
+    document.getElementById('content').addEventListener('input', debounce(function() {
+        updatePreview();
+    }, 500));
+    
+    // Debounce function to limit API calls
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this, args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(context, args);
+            }, wait);
+        };
+    }
+    
+    // Function to update preview
+    function updatePreview() {
+        const content = document.getElementById('content').value.trim();
+        const previewContainer = document.getElementById('qr-preview');
+        
+        if (content === '') {
+            previewContainer.innerHTML = `
+                <div class="flex items-center justify-center h-64 bg-gray-100 dark:bg-gray-700 rounded-md">
+                    <p class="text-gray-500 dark:text-gray-400 text-center">
+                        <i class="fas fa-qrcode text-4xl mb-2"></i><br>
+                        Enter content to generate a preview
+                    </p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Show loading state
+        previewContainer.innerHTML = `
+            <div class="flex items-center justify-center h-64 bg-gray-100 dark:bg-gray-700 rounded-md">
+                <p class="text-gray-500 dark:text-gray-400 text-center">
+                    <i class="fas fa-spinner fa-spin text-4xl mb-2"></i><br>
+                    Generating preview...
+                </p>
+            </div>
+        `;
+        
+        // Get form data
+        const formData = new FormData();
+        formData.append('content', content);
+        formData.append('size', document.getElementById('size').value);
+        formData.append('color', document.getElementById('color').value);
+        
+        // Send AJAX request
+        fetch('{{ url_for("qr.preview") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                previewContainer.innerHTML = `
+                    <div class="flex items-center justify-center h-64 bg-gray-100 dark:bg-gray-700 rounded-md">
+                        <p class="text-red-500 dark:text-red-400 text-center">
+                            <i class="fas fa-exclamation-triangle text-4xl mb-2"></i><br>
+                            Error: ${data.error}
+                        </p>
+                    </div>
+                `;
+            } else {
+                previewContainer.innerHTML = `
+                    <div class="flex items-center justify-center h-64">
+                        <img src="${data.image}" alt="QR Code Preview" class="max-h-full max-w-full">
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            previewContainer.innerHTML = `
+                <div class="flex items-center justify-center h-64 bg-gray-100 dark:bg-gray-700 rounded-md">
+                    <p class="text-red-500 dark:text-red-400 text-center">
+                        <i class="fas fa-exclamation-triangle text-4xl mb-2"></i><br>
+                        Error generating preview
+                    </p>
+                </div>
+            `;
+            console.error('Error:', error);
+        });
+    }
+</script>
+{% endblock %} 

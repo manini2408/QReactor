@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <div class="w-full md:w-1/4 mb-6 md:mb-0 md:mr-6">
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4">
+                <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Quick Links</h2>
+                <nav class="space-y-2">
+                    <a href="{{ url_for('user.dashboard') }}" class="flex items-center p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('qr.generator') }}" class="flex items-center p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-qrcode mr-2"></i> Generate QR
+                    </a>
+                    <a href="{{ url_for('user.history') }}" class="flex items-center p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-history mr-2"></i> QR History
+                    </a>
+                    <a href="{{ url_for('user.profile') }}" class="flex items-center p-2 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-gray-700 rounded-md">
+                        <i class="fas fa-user mr-2"></i> Profile
+                    </a>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="w-full md:w-3/4">
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-6">
+                <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Profile Settings</h1>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="p-4 mb-4 text-sm rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" action="{{ url_for('user.profile') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-4">
+                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.username.label }}</label>
+                        {{ form.username(class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white") }}
+                        {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.email.label }}</label>
+                        {{ form.email(class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white") }}
+                        {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="theme" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.theme.label }}</label>
+                        {{ form.theme(class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white", id="theme-select") }}
+                        {% if form.theme.errors %}
+                            {% for error in form.theme.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            Theme changes take effect immediately, but are only saved when you submit the form.
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+                        <h2 class="text-lg font-medium mb-4 text-gray-800 dark:text-white">Change Password</h2>
+                        
+                        <div class="mb-4">
+                            <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.current_password.label }}</label>
+                            {{ form.current_password(class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white") }}
+                            {% if form.current_password.errors %}
+                                {% for error in form.current_password.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.new_password.label }}</label>
+                            {{ form.new_password(class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white") }}
+                            {% if form.new_password.errors %}
+                                {% for error in form.new_password.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.confirm_password.label }}</label>
+                            {{ form.confirm_password(class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white") }}
+                            {% if form.confirm_password.errors %}
+                                {% for error in form.confirm_password.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        {{ form.submit(class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2") }}
+                    </div>
+                </form>
+                
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+                    <h2 class="text-lg font-medium mb-4 text-gray-800 dark:text-white">Account Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Member Since</h3>
+                            <p class="text-lg font-bold text-gray-900 dark:text-white">{{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Last Login</h3>
+                            <p class="text-lg font-bold text-gray-900 dark:text-white">
+                                {% if current_user.last_login %}
+                                    {{ current_user.last_login.strftime('%B %d, %Y %H:%M') }}
+                                {% else %}
+                                    Not available
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Handle form submission for theme changes
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const themeSelect = document.querySelector('select[name="theme"]');
+        const initialTheme = themeSelect.value;
+        
+        // Immediately apply theme change when dropdown changes
+        themeSelect.addEventListener('change', function() {
+            const newTheme = this.value;
+            console.log('Theme changed to:', newTheme);
+            
+            // Apply theme immediately for better UX
+            setTheme(newTheme);
+            
+            // Dispatch event for any other listeners
+            document.dispatchEvent(new CustomEvent('themeChanged', {
+                detail: { theme: newTheme }
+            }));
+        });
+        
+        // Handle form submission
+        form.addEventListener('submit', function(e) {
+            // The theme will be saved server-side
+            console.log('Form submitted with theme:', themeSelect.value);
+        });
+    });
+</script>
+{% endblock %} 

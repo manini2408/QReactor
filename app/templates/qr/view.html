@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}View QR Code{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">View QR Code</h1>
+                    <a href="{{ url_for('user.history') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to History
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- QR Code Display -->
+                    <div class="flex flex-col items-center">
+                        <div class="bg-white p-4 rounded-lg shadow-md mb-4">
+                            <img src="data:image/png;base64,{{ encoded_qr }}" alt="QR Code" class="max-w-full h-auto">
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <a href="{{ url_for('qr.download', qr_id=qr_code.id) }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                <i class="fas fa-download mr-2"></i> Download
+                            </a>
+                            {% if current_user.id == qr_code.user_id %}
+                                <form method="POST" action="{{ url_for('qr.delete', qr_id=qr_code.id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this QR code?');">
+                                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- QR Code Information -->
+                    <div>
+                        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">QR Code Details</h2>
+                        
+                        <div class="mb-4">
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Name</h3>
+                            <p class="text-lg font-medium text-gray-900 dark:text-white">{{ qr_code.name }}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Type</h3>
+                            <p class="text-lg font-medium text-gray-900 dark:text-white">{{ qr_code.qr_type }}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Content</h3>
+                            <p class="text-lg font-medium text-gray-900 dark:text-white break-words">{{ qr_code.content }}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Created</h3>
+                            <p class="text-lg font-medium text-gray-900 dark:text-white">{{ qr_code.created_at.strftime('%B %d, %Y %H:%M') }}</p>
+                        </div>
+                        
+                        {% if qr_code.description %}
+                            <div class="mb-4">
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Description</h3>
+                                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ qr_code.description }}</p>
+                            </div>
+                        {% endif %}
+                        
+                        {% if qr_code.qr_type == 'url' %}
+                            <div class="mt-6">
+                                <a href="{{ qr_code.content }}" target="_blank" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                    <i class="fas fa-external-link-alt mr-2"></i> Visit URL
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

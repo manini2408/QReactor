@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <div class="w-full md:w-1/4 mb-6 md:mb-0 md:mr-6">
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4">
+                <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Quick Links</h2>
+                <nav class="space-y-2">
+                    <a href="{{ url_for('user.dashboard') }}" class="flex items-center p-2 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-gray-700 rounded-md">
+                        <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('qr.generator') }}" class="flex items-center p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-qrcode mr-2"></i> Generate QR
+                    </a>
+                    <a href="{{ url_for('user.history') }}" class="flex items-center p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-history mr-2"></i> QR History
+                    </a>
+                    <a href="{{ url_for('user.profile') }}" class="flex items-center p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                        <i class="fas fa-user mr-2"></i> Profile
+                    </a>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="w-full md:w-3/4">
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Welcome, {{ current_user.username }}!</h1>
+                    <a href="{{ url_for('qr.generator') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <i class="fas fa-plus mr-2"></i> Create QR Code
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-blue-500 rounded-full">
+                                <i class="fas fa-qrcode text-white text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Total QR Codes</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ qr_codes|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-green-500 rounded-full">
+                                <i class="fas fa-calendar-alt text-white text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Member Since</h3>
+                                <p class="text-md font-bold text-gray-900 dark:text-white">{{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Recent QR Codes</h2>
+                
+                {% if qr_codes %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Created</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                {% for qr in qr_codes[:5] %}
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ qr.name }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                                                {{ qr.qr_type }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            {{ qr.created_at.strftime('%Y-%m-%d') }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="{{ url_for('qr.view', qr_id=qr.id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-200 mr-3">View</a>
+                                            <a href="{{ url_for('qr.download', qr_id=qr.id) }}" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-200">Download</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if qr_codes|length > 5 %}
+                        <div class="mt-4 text-center">
+                            <a href="{{ url_for('user.history') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                                View all QR codes
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="py-4 text-center text-gray-500 dark:text-gray-400">
+                        <p>You haven't created any QR codes yet.</p>
+                        <a href="{{ url_for('qr.generator') }}" class="mt-2 inline-block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">
+                            Create your first QR code
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

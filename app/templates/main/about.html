@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - QR Code Generator{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">About QR Code Generator</h1>
+        
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden mb-8">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Our Mission</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-6">
+                    Our mission is to provide a simple, efficient, and user-friendly platform for creating and managing QR codes. 
+                    We believe in making technology accessible to everyone, regardless of technical expertise.
+                </p>
+                
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">What We Offer</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <div class="p-2 bg-blue-500 rounded-full mr-3">
+                                <i class="fas fa-qrcode text-white"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Custom QR Codes</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Generate QR codes for URLs, text, contact information, and more with customizable options.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-green-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <div class="p-2 bg-green-500 rounded-full mr-3">
+                                <i class="fas fa-history text-white"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">QR Code Management</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Save, organize, and track your QR codes in one convenient dashboard.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-purple-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <div class="p-2 bg-purple-500 rounded-full mr-3">
+                                <i class="fas fa-download text-white"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Multiple Formats</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Download your QR codes in various formats including PNG, SVG, and PDF.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-yellow-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <div class="p-2 bg-yellow-500 rounded-full mr-3">
+                                <i class="fas fa-shield-alt text-white"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Secure & Private</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Your data is secure with us. We prioritize user privacy and data protection.
+                        </p>
+                    </div>
+                </div>
+                
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Our Team</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-6">
+                    We are a team of passionate developers and designers dedicated to creating tools that make technology more accessible.
+                    Our diverse backgrounds in web development, UX design, and data security allow us to build a comprehensive QR code solution.
+                </p>
+                
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Contact Us</h2>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Have questions or feedback? We'd love to hear from you! Visit our <a href="{{ url_for('main.contact') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200">Contact page</a> to get in touch.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
